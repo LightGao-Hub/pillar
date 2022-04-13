@@ -409,9 +409,7 @@ public class TestConfiguration {
 
 #### 5、注意事项：
 
-1、PillarConfig中的prefix参数极为重要, 此参数代表pillar项目中所有内置redis-key的前缀, 故master和slave要的prefix要保持一致
-
-否则会造成队列不一致从而导致消费不到或注册不到心跳；
+1、PillarConfig中的prefix参数极为重要, 此参数代表pillar项目中所有内置redis-key的前缀, 故master和slave要的prefix要保持一致，否则会造成队列不一致从而导致消费不到或注册不到心跳；
 
 ​	若想在一个服务中使用多个不同的master/slave，则可以创建多个不同prefix参数的pillarConfig，然后创建master/slave。
 
@@ -419,7 +417,9 @@ public class TestConfiguration {
 
 3、pillarMaster/pillarSlave 消费一次数据处理完毕后记得调用commit接口, 此时pillar会将内置的执行队列中的数据删除, 若不提交pillar会认为此任务一直在执行。
 
-4、若调用pillarMaster/pillarSlave的close接口，则pillarMaster/pillarSlave 将不会再向redis注册心跳，但此时若是调用consume接口，还是可以正常消费数据，故此接口常用于java进程kill时设置关闭钩子时调用。
+4、pillar的高/中/低三种任务队列都是redis的有序队列[sortSet]，而有序队列中相同的数据会覆盖！故建议在业务层面上给任务字符串上增加唯一id, 否则相同任务字符串会被覆盖，从而导致下游slave只会执行一次任务。
+
+5、若调用pillarMaster/pillarSlave的close接口，则pillarMaster/pillarSlave 将不会再向redis注册心跳，但此时若是调用consume接口，还是可以正常消费数据，故此接口常用于java进程kill时设置关闭钩子时调用。
 
 
 
