@@ -16,7 +16,7 @@ import org.pillar.service.pillar.impl.PillarServiceImpl;
  * Date: 2022-03-26
  */
 @Slf4j
-public class PillarSlave implements Slave<String> {
+public class PillarSlave implements PSlave<String> {
 
     private final PContext context;
     private final PillarService<String, String> pillarService;

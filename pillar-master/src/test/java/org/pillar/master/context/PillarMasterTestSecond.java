@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
-import org.pillar.core.enums.QueueType;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -15,9 +14,7 @@ import org.redisson.config.Config;
 import java.net.URL;
 import java.util.stream.IntStream;
 
-import static org.pillar.core.enums.CommonConstants.FIRST;
 import static org.pillar.core.enums.CommonConstants.REDIS_SPLIT;
-import static org.pillar.core.enums.CommonConstants.SECOND;
 import static org.pillar.core.enums.CommonConstants.SEVENTH;
 import static org.pillar.core.enums.CommonConstants.THIRD;
 import static org.pillar.core.enums.CommonConstants.ZERO;
@@ -27,8 +24,8 @@ public class PillarMasterTestSecond {
     private final String prefix = "test:master";
     private final long heartbeatInterval = 10 * 1000;
     private final int expirationCount = 3;
-    private Master<String> pillarMaster;
-    private Master<String> pillarMaster2;
+    private PMaster<String> pillarMaster;
+    private PMaster<String> pillarMaster2;
     private PContext context;
 
     @Before

@@ -15,7 +15,7 @@ import org.pillar.core.enums.QueueType;
  * Author: GL
  * Date: 2022-03-26
  */
-public interface Master<T> extends Closeable {
+public interface PMaster<T> extends Closeable {
     /**
      * 将任务存放至队列中, 支持hign/medium/low三种优先级队列, 支持同一任务优先级修改
      * 注意: 由于底层使用的是redis-sortSet, 故存入的任务字符串要保持唯一, 建议业务层面设置唯一任务Id

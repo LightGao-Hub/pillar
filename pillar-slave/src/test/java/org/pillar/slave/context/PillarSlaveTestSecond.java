@@ -25,8 +25,8 @@ public class PillarSlaveTestSecond {
     private final String prefix = "test:slave";
     private final long heartbeatInterval = 10 * 1000;
     private final int expirationCount = 3;
-    private PillarSlave pillarSlave;
-    private PillarSlave pillarSlave2;
+    private PSlave<String> pillarSlave;
+    private PSlave<String> pillarSlave2;
     private PContext context;
 
     @Before

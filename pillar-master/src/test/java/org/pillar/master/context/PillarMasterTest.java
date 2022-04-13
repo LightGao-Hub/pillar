@@ -26,7 +26,7 @@ public class PillarMasterTest {
     private final String prefix = "test:master";
     private final long heartbeatInterval = 10 * 1000;
     private final int expirationCount = 3;
-    private Master<String> pillarMaster;
+    private PMaster<String> pillarMaster;
     private PContext context;
 
     @Before

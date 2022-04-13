@@ -28,7 +28,7 @@ import org.pillar.service.pillar.impl.PillarServiceImpl;
  * Date: 2022-03-26
  */
 @Slf4j
-public class PillarMaster implements Master<String> {
+public class PillarMaster implements PMaster<String> {
 
     private final PContext context;
     private final LeaderService leaderService;

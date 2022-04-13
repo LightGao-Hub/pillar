@@ -33,10 +33,10 @@ import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
 import org.pillar.core.enums.QueueType;
 import org.pillar.core.lambdas.ProcessLambda;
-import org.pillar.master.context.Master;
+import org.pillar.master.context.PMaster;
 import org.pillar.master.context.PillarMaster;
 import org.pillar.slave.context.PillarSlave;
-import org.pillar.slave.context.Slave;
+import org.pillar.slave.context.PSlave;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -67,8 +67,8 @@ public class PillarTest {
     private final int expirationCount = 3;
     private PContext context;
     private PConfig config;
-    private Master<String> pillarMaster;
-    private Slave<String> pillarSlave;
+    private PMaster<String> pillarMaster;
+    private PSlave<String> pillarSlave;
 
     @Before
     public void setUp() throws Exception {
