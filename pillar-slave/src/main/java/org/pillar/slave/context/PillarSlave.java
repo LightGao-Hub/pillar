@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pillar.core.config.PConfig;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarContext;
 import org.pillar.service.leader.LeaderService;
 import org.pillar.service.leader.impl.LeaderServiceImpl;
@@ -17,25 +18,25 @@ import org.pillar.service.pillar.impl.PillarServiceImpl;
 @Slf4j
 public class PillarSlave implements Slave<String> {
 
-    private final PillarContext pillarContext;
+    private final PContext context;
     private final PillarService<String, String> pillarService;
     private final LeaderService leaderService;
 
     public PillarSlave(PConfig pConfig) {
-        this.pillarContext = new PillarContext(pConfig);
-        this.pillarService = new PillarServiceImpl(pillarContext);
-        this.leaderService = new LeaderServiceImpl(pillarContext, pillarContext.slaveHashKey());
+        this.context = new PillarContext(pConfig);
+        this.pillarService = new PillarServiceImpl(context);
+        this.leaderService = new LeaderServiceImpl(context, context.slaveHashKey());
     }
 
     @Override
     public Optional<String> consume() {
-        return pillarContext.getRedissonUtils().lock(pillarContext.slaveConsumerLock(), Optional.empty(), (t) -> {
-            for (String queueName : pillarContext.getAllQueue()) {
-                Optional<String> tValue = pillarContext.getRedissonUtils().zrpop(queueName);
+        return context.getRedissonUtils().lock(context.slaveConsumerLock(), Optional.empty(), (t) -> {
+            for (String queueName : context.getAllQueue()) {
+                Optional<String> tValue = context.getRedissonUtils().zrpop(queueName);
                 if (tValue.isPresent()) {
-                    pillarService.sendExecuteQueue(pillarContext.slaveHashKey(), tValue.get());
-                    pillarContext.getRedissonUtils().zrem(queueName, tValue.get());
-                    log.info("slave[{}] consume finished, queue: {}, value: {}", pillarContext.slaveHashKey(), queueName, tValue);
+                    pillarService.sendExecuteQueue(context.slaveHashKey(), tValue.get());
+                    context.getRedissonUtils().zrem(queueName, tValue.get());
+                    log.info("slave[{}] consume finished, queue: {}, value: {}", context.slaveHashKey(), queueName, tValue);
                     return tValue;
                 }
             }
@@ -45,19 +46,19 @@ public class PillarSlave implements Slave<String> {
 
     @Override
     public int getExecuteQueueSum() {
-        return pillarService.getExecuteQueueSum(pillarContext.slaveHashKey());
+        return pillarService.getExecuteQueueSum(context.slaveHashKey());
     }
 
     @Override
     public void commit(String value, String executeValue) {
-        pillarContext.getRedissonUtils().rpush(pillarContext.resultQueue(), value);
-        pillarService.commitExecuteTask(pillarContext.slaveHashKey(), executeValue);
-        log.info("slave[{}] commit finished, resultQueue: {}, value: {}", pillarContext.slaveHashKey(), pillarContext.resultQueue(), value);
+        context.getRedissonUtils().rpush(context.resultQueue(), value);
+        pillarService.commitExecuteTask(context.slaveHashKey(), executeValue);
+        log.info("slave[{}] commit finished, resultQueue: {}, value: {}", context.slaveHashKey(), context.resultQueue(), value);
     }
 
     @Override
     public String getNodeInfo() {
-        return pillarContext.slaveHashKey();
+        return context.slaveHashKey();
     }
 
     @Override

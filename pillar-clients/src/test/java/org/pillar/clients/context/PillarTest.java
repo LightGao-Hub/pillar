@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.pillar.core.config.PConfig;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
 import org.pillar.core.enums.QueueType;
@@ -64,7 +65,7 @@ public class PillarTest {
     private final String prefix = "test:pillar";
     private final long heartbeatInterval = 10 * 1000;
     private final int expirationCount = 3;
-    private PillarContext context;
+    private PContext context;
     private PConfig config;
     private Master<String> pillarMaster;
     private Slave<String> pillarSlave;

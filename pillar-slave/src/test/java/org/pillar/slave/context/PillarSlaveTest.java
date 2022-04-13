@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
 import org.redisson.Redisson;
@@ -25,7 +26,7 @@ public class PillarSlaveTest {
     private final long heartbeatInterval = 10 * 1000;
     private final int expirationCount = 3;
     private PillarSlave pillarSlave;
-    private PillarContext context;
+    private PContext context;
 
     @Before
     public void setUp() throws Exception {
@@ -62,7 +63,7 @@ public class PillarSlaveTest {
 
     @Test
     public void getExecuteQueueSum() {
-        log.info("getExecuteQueueSum finished, {}", pillarSlave.getExecuteQueueSum());
+        log.info("getExecuteQueueSum finished: {}", pillarSlave.getExecuteQueueSum());
     }
 
     @Test
@@ -89,7 +90,8 @@ public class PillarSlaveTest {
                 context.getAllQueue().forEach((queue) -> context.getRedissonUtils().zadd(queue, number, queue.concat(REDIS_SPLIT).concat(String.valueOf(number)))));
     }
 
-    private void clean() {
+    @Test
+    public void clean() {
         context.getAllKey().forEach((v) -> context.getRedissonUtils().del(v));
     }
 }

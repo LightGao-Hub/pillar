@@ -14,6 +14,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bigdata.redisson.common.utils.RedissonUtils;
 import org.pillar.core.config.PConfig;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarContext;
 import org.pillar.core.enums.PillarStatus;
 import org.pillar.core.enums.QueueType;
@@ -29,44 +30,44 @@ import org.pillar.service.pillar.impl.PillarServiceImpl;
 @Slf4j
 public class PillarMaster implements Master<String> {
 
-    private final PillarContext pillarContext;
+    private final PContext context;
     private final LeaderService leaderService;
     private final PillarService<String, String> pillarService;
 
     public PillarMaster(PConfig pConfig) {
-        this.pillarContext = new PillarContext(pConfig);
-        this.pillarService = new PillarServiceImpl(pillarContext);
-        this.leaderService = new LeaderServiceImpl(pillarContext, pillarContext.masterHashKey());
+        this.context = new PillarContext(pConfig);
+        this.pillarService = new PillarServiceImpl(context);
+        this.leaderService = new LeaderServiceImpl(context, context.masterHashKey());
     }
 
     @Override
     public void send(QueueType queue, double score, String value) {
-        pillarContext.getRedissonUtils().zadd(pillarContext.getQueue(queue), score, value);
-        log.info("master[{}] send finished, queue: {}, score: {}, value: {}", pillarContext.masterHashKey(), queue, score, value);
+        context.getRedissonUtils().zadd(context.getQueue(queue), score, value);
+        log.info("master[{}] send finished, queue: {}, score: {}, value: {}", context.masterHashKey(), queue, score, value);
     }
 
     @Override
     public Optional<String> consume() {
-        return pillarContext.getRedissonUtils().lock(pillarContext.masterConsumerLock(), Optional.empty(), (t) -> {
-            Optional<String> rValue = pillarContext.getRedissonUtils().rlpop(pillarContext.resultQueue());
+        return context.getRedissonUtils().lock(context.masterConsumerLock(), Optional.empty(), (t) -> {
+            Optional<String> rValue = context.getRedissonUtils().rlpop(context.resultQueue());
             rValue.ifPresent(v -> {
-                pillarService.sendExecuteQueue(pillarContext.masterHashKey(), rValue.get());
-                pillarContext.getRedissonUtils().lpop(pillarContext.resultQueue());
+                pillarService.sendExecuteQueue(context.masterHashKey(), rValue.get());
+                context.getRedissonUtils().lpop(context.resultQueue());
             });
-            log.info("master[{}] consume finished, queue: {}, value: {}", pillarContext.masterHashKey(), pillarContext.resultQueue(), rValue);
+            log.info("master[{}] consume finished, queue: {}, value: {}", context.masterHashKey(), context.resultQueue(), rValue);
             return rValue;
         });
     }
 
     @Override
     public PillarStatus delete(QueueType queue, String value) {
-        return pillarContext.getRedissonUtils().zrem(pillarContext.getQueue(queue), value) == TRUE
+        return context.getRedissonUtils().zrem(context.getQueue(queue), value) == TRUE
                 ? PillarStatus.SUCCESS : PillarStatus.NON_EXISTENT;
     }
 
     @Override
     public PillarStatus delete(String value) {
-        for (QueueType queueType : pillarContext.getAllQueueType()) {
+        for (QueueType queueType : context.getAllQueueType()) {
             if (delete(queueType, value) == PillarStatus.SUCCESS) {
                 return PillarStatus.SUCCESS;
             }
@@ -76,60 +77,60 @@ public class PillarMaster implements Master<String> {
 
     @Override
     public Collection<RedissonUtils.ScoredEntryEx<String>> getQueue(QueueType queue) {
-        return pillarContext.getRedissonUtils().zrangebyscore(pillarContext.getQueue(queue), ZERO, END_INDEX);
+        return context.getRedissonUtils().zrangebyscore(context.getQueue(queue), ZERO, END_INDEX);
     }
 
     @Override
     public Map<QueueType, Collection<RedissonUtils.ScoredEntryEx<String>>> getAllQueue() {
         return new HashMap<QueueType, Collection<RedissonUtils.ScoredEntryEx<String>>>() {{
-            pillarContext.getAllQueueType().forEach(queue -> put(queue,
-                    pillarContext.getRedissonUtils().zrangebyscore(pillarContext.getQueue(queue), ZERO, END_INDEX)));
+            context.getAllQueueType().forEach(queue -> put(queue,
+                    context.getRedissonUtils().zrangebyscore(context.getQueue(queue), ZERO, END_INDEX)));
         }};
     }
 
     @Override
     public Optional<List<String>> getExecuteQueue() {
-        Optional<String> value = pillarContext.getRedissonUtils().hget(pillarContext.executeHash(), pillarContext.masterHashKey());
-        return value.map(pillarContext::deletePillarSplit);
+        Optional<String> value = context.getRedissonUtils().hget(context.executeHash(), context.masterHashKey());
+        return value.map(context::deletePillarSplit);
     }
 
     @Override
     public int getExecuteQueueSum() {
-        return pillarService.getExecuteQueueSum(pillarContext.masterHashKey());
+        return pillarService.getExecuteQueueSum(context.masterHashKey());
     }
 
     @Override
     public int getResultQueueSum() {
-        return pillarContext.getRedissonUtils().llen(pillarContext.resultQueue());
+        return context.getRedissonUtils().llen(context.resultQueue());
     }
 
     @Override
     public double getQueueMax(QueueType queue) {
-        return pillarContext.getRedissonUtils().zmax(pillarContext.getQueue(queue));
+        return context.getRedissonUtils().zmax(context.getQueue(queue));
     }
 
     @Override
     public int getQueueSize(QueueType queue) {
-        return pillarContext.getRedissonUtils().zcard(pillarContext.getQueue(queue));
+        return context.getRedissonUtils().zcard(context.getQueue(queue));
     }
 
     @Override
     public Map<QueueType, Integer> getQueueSize() {
         return new HashMap<QueueType, Integer>() {{
-            pillarContext.getAllQueueType().forEach(queue -> put(queue, getQueueSize(queue)));
+            context.getAllQueueType().forEach(queue -> put(queue, getQueueSize(queue)));
         }};
     }
 
     @Override
     public void commit(String resultValue) {
-        pillarService.commitExecuteTask(pillarContext.masterHashKey(), resultValue);
-        log.info("master[{}] commit finished, executeHash: {}, resultValue: {}", pillarContext.masterHashKey(),
-                pillarContext.executeHash(), resultValue);
+        pillarService.commitExecuteTask(context.masterHashKey(), resultValue);
+        log.info("master[{}] commit finished, executeHash: {}, resultValue: {}", context.masterHashKey(),
+                context.executeHash(), resultValue);
     }
 
     @Override
     public String getNodeInfo() {
-        return pillarContext.masterHashKey();
+        return context.masterHashKey();
     }
 
     @Override

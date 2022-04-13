@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.pillar.core.config.PillarContext;
+import org.pillar.core.config.PContext;
 import org.pillar.service.pillar.PillarService;
 
 /**
@@ -18,41 +18,41 @@ import org.pillar.service.pillar.PillarService;
 @Slf4j
 public class PillarServiceImpl implements PillarService<String, String> {
 
-    private final PillarContext pillarContext;
+    private final PContext context;
 
-    public PillarServiceImpl(PillarContext pillarContext) {
-        this.pillarContext = pillarContext;
+    public PillarServiceImpl(PContext context) {
+        this.context = context;
     }
 
     @Override
     public void sendExecuteQueue(String hashKey, String value) {
-        Optional<String> oldHashValue = pillarContext.getRedissonUtils().hget(pillarContext.executeHash(), hashKey);
-        String hashValue = pillarContext.addPillarSplit(oldHashValue, value);
-        pillarContext.getRedissonUtils().hset(pillarContext.executeHash(), hashKey, hashValue);
-        log.info("PillarService:sendExecuteQueue, executeHash: {}, hashKey: {}, value: {}, oldHashValue: {}, newHashValue: {}",
-                pillarContext.executeHash(), hashKey, value, oldHashValue, hashValue);
+        Optional<String> oldHashValue = context.getRedissonUtils().hget(context.executeHash(), hashKey);
+        String hashValue = context.addPillarSplit(oldHashValue, value);
+        context.getRedissonUtils().hset(context.executeHash(), hashKey, hashValue);
+        log.debug("PillarService:sendExecuteQueue, executeHash: {}, hashKey: {}, value: {}, oldHashValue: {}, newHashValue: {}",
+                context.executeHash(), hashKey, value, oldHashValue, hashValue);
     }
 
     @Override
     public void commitExecuteTask(String hashKey, String value) {
-        Optional<String> oldHashValue = pillarContext.getRedissonUtils().hget(pillarContext.executeHash(), hashKey);
+        Optional<String> oldHashValue = context.getRedissonUtils().hget(context.executeHash(), hashKey);
         oldHashValue.ifPresent((v) -> {
-            List<String> collect = pillarContext.deletePillarSplit(v).stream().filter((s) -> !s.equals(value)).collect(Collectors.toList());
+            List<String> collect = context.deletePillarSplit(v).stream().filter((s) -> !s.equals(value)).collect(Collectors.toList());
             String hashValue = null;
             if (collect.isEmpty()) {
-                pillarContext.getRedissonUtils().hdel(pillarContext.executeHash(), hashKey);
+                context.getRedissonUtils().hdel(context.executeHash(), hashKey);
             } else {
                 hashValue = String.join(HASH_VALUE_SPLIT, collect);
-                pillarContext.getRedissonUtils().hset(pillarContext.executeHash(), hashKey, hashValue);
+                context.getRedissonUtils().hset(context.executeHash(), hashKey, hashValue);
             }
-            log.info("[{}] commitExecuteTask, executeHash: {}, hashKey: {}, value: {}, oldHashValue: {}, newHashValue: {}",
-                    hashKey, pillarContext.executeHash(), hashKey, value, oldHashValue, hashValue);
+            log.debug("[{}] commitExecuteTask, executeHash: {}, hashKey: {}, value: {}, oldHashValue: {}, newHashValue: {}",
+                    hashKey, context.executeHash(), hashKey, value, oldHashValue, hashValue);
         });
     }
 
     @Override
     public int getExecuteQueueSum(String hashKey) {
-        Optional<String> execute = pillarContext.getRedissonUtils().hget(pillarContext.executeHash(), hashKey);
-        return execute.map(s -> pillarContext.deletePillarSplit(s).size()).orElse(ZERO);
+        Optional<String> execute = context.getRedissonUtils().hget(context.executeHash(), hashKey);
+        return execute.map(s -> context.deletePillarSplit(s).size()).orElse(ZERO);
     }
 }

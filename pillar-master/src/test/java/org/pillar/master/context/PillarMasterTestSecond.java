@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
 import org.pillar.core.enums.QueueType;
@@ -28,7 +29,7 @@ public class PillarMasterTestSecond {
     private final int expirationCount = 3;
     private Master<String> pillarMaster;
     private Master<String> pillarMaster2;
-    private PillarContext context;
+    private PContext context;
 
     @Before
     public void setUp() throws Exception {
@@ -78,7 +79,8 @@ public class PillarMasterTestSecond {
                 context.getRedissonUtils().rpush(context.resultQueue(), context.resultQueue().concat(REDIS_SPLIT).concat(String.valueOf(number))));
     }
 
-    private void clean() {
+    @Test
+    public void clean() {
         context.getAllKey().forEach((v) -> context.getRedissonUtils().del(v));
     }
 }

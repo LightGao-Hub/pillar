@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
 import org.pillar.service.leader.impl.LeaderServiceTest;
@@ -23,7 +24,7 @@ public class PillarServiceImplTest {
     private final String prefix = "test:pillar:service";
     private final long heartbeatInterval = 10 * 1000;
     private final int expirationCount = 3;
-    private PillarContext context;
+    private PContext context;
     private PillarService<String, String> pillarService;
 
     @Before

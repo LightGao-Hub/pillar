@@ -18,7 +18,7 @@ import java.util.UUID;
 @Slf4j
 public class RedissonTest {
 
-    RedissonClient redissonClient;
+    private RedissonClient redissonClient;
 
     @Before
     public void init() throws IOException {

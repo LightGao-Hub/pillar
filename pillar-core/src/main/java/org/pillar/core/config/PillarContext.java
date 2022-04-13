@@ -30,16 +30,15 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import org.bigdata.redisson.common.utils.RedissonUtils;
 import org.pillar.core.enums.QueueType;
-import org.redisson.api.RedissonClient;
 
 /**
- * 由于用户可以在一个服务中启动多个pillar-master/slave, pConfig参数不同, 故此处context非静态使用
+ * 由于用户可能在一个服务中启动多个master/slave, pConfig参数不同, 故此处context非静态使用
  *
  * Author: GL
  * Date: 2022-03-26
  */
 @Getter
-public final class PillarContext {
+public final class PillarContext implements PContext {
 
     private final PConfig config;
     private final String pidHostname;
@@ -51,22 +50,22 @@ public final class PillarContext {
         this.redissonUtils = RedissonUtils.getInstance(Optional.ofNullable(config.getRedissonClient()));
     }
 
+    @Override
     public String prefix() {
         return this.config.getPrefix();
     }
 
-    public RedissonClient redissonClient() {
-        return this.config.getRedissonClient();
-    }
-
+    @Override
     public long heartbeatInterval() {
         return this.config.getHeartbeatInterval();
     }
 
+    @Override
     public int expirationCount() {
         return this.config.getExpirationCount();
     }
 
+    @Override
     public long timestamp() {
         return System.currentTimeMillis();
     }
@@ -74,80 +73,99 @@ public final class PillarContext {
     /**
      * 获取节点过期时间阈值
      */
+    @Override
     public long expirationTime() {
         return expirationCount() * heartbeatInterval();
     }
 
+    @Override
     public String leaderLock() {
         return redisFormat(prefix(), LEADER_LOCK);
     }
 
+    @Override
     public String leaderName() {
         return redisFormat(prefix(), LEADER_NAME);
     }
 
+    @Override
     public String hignQueue() {
         return redisFormat(prefix(), HIGN_QUEUE);
     }
 
+    @Override
     public String mediumQueue() {
         return redisFormat(prefix(), MEDIUM_QUEUE);
     }
 
+    @Override
     public String lowQueue() {
         return redisFormat(prefix(), LOW_QUEUE);
     }
 
+    @Override
     public String getQueue(QueueType queueType) {
         return redisFormat(prefix(), queueType.getQueue());
     }
 
+    @Override
     public List<String> getAllQueue() {
         return Arrays.asList(hignQueue(), mediumQueue(), lowQueue());
     }
 
+    @Override
     public List<QueueType> getAllQueueType() {
         return Arrays.asList(QueueType.HIGN, QueueType.MEDIUM, QueueType.LOW);
     }
 
+    @Override
     public String resultQueue() {
         return redisFormat(prefix(), RESULT_QUEUE);
     }
 
+    @Override
     public String masterConsumerLock() {
         return redisFormat(prefix(), MASTER_LOCK);
     }
 
+    @Override
     public String slaveConsumerLock() {
         return redisFormat(prefix(), SLAVE_LOCK);
     }
 
+    @Override
     public String executeHash() {
         return redisFormat(prefix(), EXECUTE_HASH);
     }
 
+    @Override
     public String heartHash() {
         return redisFormat(prefix(), HEART_HASH);
     }
 
+    @Override
     public String masterHashKey() {
         return redisFormat(MASTER_PREFIX, this.pidHostname);
     }
 
+    @Override
     public String slaveHashKey() {
         return redisFormat(SLAVE_PREFIX, this.pidHostname);
     }
 
+    @Override
     public List<String> getAllKey() {
         return Stream.of(hignQueue(), mediumQueue(), lowQueue(), resultQueue(), leaderLock(), leaderName(), masterConsumerLock(),
                 slaveConsumerLock(), executeHash(), heartHash()).collect(Collectors.toList());
     }
 
+    @Override
     public String addPillarSplit(Optional<String> source, String value) {
         Objects.requireNonNull(value);
         return source.map(s -> s.concat(HASH_VALUE_SPLIT).concat(value)).orElse(value);
     }
 
+    @Override
     public List<String> deletePillarSplit(String value) {
         Objects.requireNonNull(value);
         return new ArrayList<>(Arrays.asList(value.split(HASH_VALUE_SPLIT_ESCAPE)));

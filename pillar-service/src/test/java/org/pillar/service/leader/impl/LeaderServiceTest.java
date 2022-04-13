@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.pillar.core.config.PContext;
 import org.pillar.core.config.PillarConfig;
 import org.pillar.core.config.PillarContext;
 import org.pillar.service.leader.LeaderService;
@@ -14,7 +15,6 @@ import org.redisson.config.Config;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.pillar.core.enums.CommonConstants.END_INDEX;
 import static org.pillar.core.enums.CommonConstants.REDIS_SPLIT;
@@ -32,7 +32,7 @@ public class LeaderServiceTest {
     private final int expirationCount = 3;
     private final long leaderSleep = 1000;
     private final long sleep = 1000 * 60 * 60;
-    private PillarContext context;
+    private PContext context;
 
     @Before
     public void setUp() throws IOException {
