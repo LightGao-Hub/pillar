@@ -191,7 +191,7 @@ pillar同样可以解决以上问题, 后面将会详细讲解pillar的架构设
 
 3、pillar通过redis队列发放任务，天然异步处理。    
 
-4、pillar内部使用高/中/低 三种队列进行存储任务数据    
+4、pillar内部使用高/中/低 三种队列进行存储任务数据，并且队列使用sortSet，天然支持权重设置    
 
 #### 场景二
 
@@ -206,9 +206,7 @@ pillar同样可以解决以上问题, 后面将会详细讲解pillar的架构设
 
 ## 快速使用
 
-​	pillar是基于redis的分布式主从任务分配通用框架, 故项目中需要大量操作redis, 而pillar使用redisson-common公共包作为reids
-
-的操作模块，关于redisson-common项目可以看我的另一个项目: https://github.com/gl0726/bigdata-common/tree/master/redisson-common
+​	pillar是基于redis的分布式主从任务分配通用框架, 故项目中需要大量操作redis, 而pillar使用redisson-common公共包作为reids的操作模块，关于redisson-common项目可以看我的另一个项目: https://github.com/gl0726/bigdata-common/tree/master/redisson-common
 
 
 
