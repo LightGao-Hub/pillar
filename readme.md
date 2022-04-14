@@ -328,7 +328,7 @@ public class Pillar {
         PMaster<String> pillarMaster = new PillarMaster(pConfig);
     }
 
-    public void createSaster() {
+    public void createSlave() {
         PConfig pConfig = pillarConfig(redissonClient());
         PSlave<String> pillarSlave = new PillarSlave(pConfig);
     }
