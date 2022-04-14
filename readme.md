@@ -325,7 +325,7 @@ public class Pillar {
 
     public void createMaster() {
         PConfig pConfig = pillarConfig(redissonClient());
-        PMaster<String> pillarMaster = new PillarMaster(pConfig);
+        PMaster<String> pillarMaster = new PillarMaster(pConfig); // 目前泛型只支持String类型, 后期1.0版本会兼容所有基本类型和类类型
     }
 
     public void createSlave() {
@@ -415,9 +415,11 @@ public class TestConfiguration {
 
 3、pillarMaster/pillarSlave 消费一次数据处理完毕后记得调用commit接口, 此时pillar会将内置的执行队列中的数据删除, 若不提交pillar会认为此任务一直在执行。
 
-4、pillar的高/中/低三种任务队列都是redis的有序队列[sortSet]，而有序队列中相同的数据会覆盖！故建议在业务层面上给任务字符串上增加唯一id, 否则相同任务字符串会被覆盖，从而导致下游slave只会执行一次任务。
+4、pillar的高/中/低三种任务队列都是redis的有序队列[sortSet]，而有序队列中相同的数据会覆盖！故建议在业务层面上给任务字符串上增加唯一id, 否则相同任务字符串会被覆盖，从而导致下游slave只会执行一次任务。  
 
-5、若调用pillarMaster/pillarSlave的close接口，则pillarMaster/pillarSlave 将不会再向redis注册心跳，但此时若是调用consume接口，还是可以正常消费数据，故此接口常用于java进程kill时设置关闭钩子时调用。
+**5、pillar当前版本只支持String任务类型, 如: PMaster<String> = new PillarMaster() 泛型只支持String; 后期1.0版本将会支持Java所有基本类型和类类型；**
+
+6、若调用pillarMaster/pillarSlave的close接口，则pillarMaster/pillarSlave 将不会再向redis注册心跳，但此时若是调用consume接口，还是可以正常消费数据，故此接口常用于java进程kill时设置关闭钩子时调用。
 
 
 
