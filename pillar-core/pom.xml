@@ -21,7 +21,7 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.haizhi</groupId>
+            <groupId>org.bigdata</groupId>
             <artifactId>redisson-common</artifactId>
         </dependency>
         <dependency>
