@@ -34,8 +34,8 @@ public enum CommonConstants {
     public static final String REDIS_SPLIT = ":";
 
     public static final long MILLISECOND = 1000;
-    public static final long HEARTBEAT_INTERVAL = 30 * 1000;
-    public static final long MIN_HEARTBEAT_INTERVAL = 10 * 1000;
+    public static final long HEARTBEAT_INTERVAL = 30 * MILLISECOND;
+    public static final long MIN_HEARTBEAT_INTERVAL = 10 * MILLISECOND;
     public static final int EXPIRATION_COUNT = 6;
     public static final int MIN_EXPIRATION_COUNT = 3;
     public static final int FIRST = 1;
@@ -45,9 +45,19 @@ public enum CommonConstants {
     public static final int FIFTH = 5;
     public static final int SIXTH = 6;
     public static final int SEVENTH = 7;
+    public static final int EIGHT = 7;
     public static final int TENTH = 10;
     public static final int ZERO = 0;
     public static final int END_INDEX = -1;
+    public static final double DOUBLE_FIRST = 1.0;
+
+    public static final long OHOURS = 60 * 60;
+    public static final long THOURS = OHOURS * SECOND;
+    public static final long FHOURS = OHOURS * FOURTH;
+    public static final long SHOURS = OHOURS * SIXTH;
+    public static final long EHOURS = OHOURS * EIGHT;
+    public static final long HALFDAY = OHOURS * TENTH * SECOND;
+    public static final long DAYDAY = HALFDAY * SECOND;
 
     public static final boolean FALSE = false;
     public static final boolean TRUE = true;

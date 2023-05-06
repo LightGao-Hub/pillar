@@ -95,6 +95,8 @@ public class LeaderServiceImpl implements LeaderService {
                     throw new PillarHashPrefixException(String.format("executeHash key prefix is not present, key: %s", k));
                 }
                 redissonUtils.hdel(context.executeHash(), k);
+                // 假设redis宕机后重启，这期间所有的executor的heart都过期了，leader的监听就会开始工作然后将heartHash删除
+                // 不过没关系，executor还会间隔一段时间后重新注册
                 redissonUtils.hdel(context.heartHash(), k);
                 log.warn("node downtime processing Successful, delete old executeHash: {}, delete old heartKey: {}, ", k, k);
             }
@@ -119,6 +121,7 @@ public class LeaderServiceImpl implements LeaderService {
         log.warn("slave node downtime processing end, value: {}, score: {} to hignQueue: {}", value, zmax, context.hignQueue());
     }
 
+    // TODO:需要包裹异常，因如果redis宕机异常，此线程不可中断，仍需发送心跳直到redis恢复;
     public void process(ProcessLambda lambda) {
         while (!stopper.get()) {
             lambda.process();

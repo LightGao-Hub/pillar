@@ -2,9 +2,9 @@
 
 ## 简介
 
-​	pillar是基于redis的分布式主从任务分配通用框架, 主要解决master/slave之间任务分配, 心跳机制, 宕机处理, 异步执行的通用框架, 支持高可用, 高可靠。
+​	pillar是基于redis的分布式主从任务分配通用框架, 主要解决分布式服务之间: 任务分配, 心跳机制, 宕机处理, 异步执行的通用框架, 支持高可用, 高可靠。
 
-​	由于pillar是基于redis, 故master/slave无需知道对方的ip端口, 只需通过redis队列进行任务发放和消费即可, 开发人员只需着重于业务开发, 无需考虑master/slave节点宕机后的处理, 也无需考虑分布式锁等问题。
+​	由于pillar是基于redis, 故服务与服务之间无需知道对方的ip端口, 只需通过redis队列进行任务发放和消费即可, 开发人员只需着重于业务开发, 无需考虑主从节点宕机后的处理, 也无需考虑分布式锁等问题。
 
 ​	此框架目标是希望所有想实现master/slave任务分配架构的项目无需再造轮子, 只需要基于pillar之上开发即可。
 
@@ -409,7 +409,11 @@ public class TestConfiguration {
 
 1、PillarConfig中的prefix参数极为重要, 此参数代表pillar项目中所有内置redis-key的前缀, 故master和slave要的prefix要保持一致，否则会造成队列不一致从而导致消费不到或注册不到心跳；
 
-​	若想在一个服务中使用多个不同的master/slave，则可以创建多个不同prefix参数的pillarConfig，然后创建master/slave。
+​	若想在一个服务中使用多组不同的master/slave，则可以创建多个不同prefix参数的pillarConfig，然后创建master/slave。
+
+​	注意：pillar默认是运行在分布式服务上的，若运行在单个服务器上则无法保证可靠性，因leader只有一个，单服务宕机后则无法监控；
+
+​	此外由于pillar的心跳机制是根据pid@hostname为key的，故如果单服务器上的启动多个pillarSlave则心跳机制会失效，因其key完全一致，此问题会在pillar2.0版本解决。
 
 2、pillarMaster/pillarSlave 的consume消费接口调用一次便会消费一次，若不调用则永不消费，故开发人员可以在外部设置线程池和并发数来调用slave的consume接口, 自行控制消费速度。
 
