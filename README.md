@@ -16,7 +16,7 @@
 
 ​	架构图如下：master/slave分别部署在不同的物理机, master支持多活
 
-![image-20220411104408597](https://raw.githubusercontent.com/gl0726/pillar/master/picture/picture1.png)
+![image-20220411104408597](https://raw.githubusercontent.com/gaolight/pillar/master/picture/picture1.png)
 
 ​	
 
@@ -36,7 +36,7 @@
 
 ​	如下图：
 
-![image-20220411105448541](https://raw.githubusercontent.com/gl0726/pillar/master/picture/picture2.png)
+![image-20220411105448541](https://raw.githubusercontent.com/gaolight/pillar/master/picture/picture2.png)
 
 
 
@@ -52,7 +52,7 @@ pillar同样可以解决以上问题, 后面将会详细讲解pillar的架构设
 
 ### 架构一览
 
-![image-20220411151336151](https://raw.githubusercontent.com/gl0726/pillar/master/picture/picture3.png)
+![image-20220411151336151](https://raw.githubusercontent.com/gaolight/pillar/master/picture/picture3.png)
 
 
 
@@ -206,7 +206,7 @@ pillar同样可以解决以上问题, 后面将会详细讲解pillar的架构设
 
 ## 快速使用
 
-​	pillar是基于redis的分布式主从任务分配通用框架, 故项目中需要大量操作redis, 而pillar使用redisson-common公共包作为reids的操作模块，关于redisson-common项目可以看我的另一个项目: https://github.com/gl0726/bigdata-common/tree/master/redisson-common
+​	pillar是基于redis的分布式主从任务分配通用框架, 故项目中需要大量操作redis, 而pillar使用redisson-common公共包作为reids的操作模块，关于redisson-common项目可以看我的另一个项目: https://github.com/gaolight/bigdata-common/tree/master/redisson-common
 
 
 
@@ -228,12 +228,12 @@ docker run -itd --name redis-test -p 6379:6379 redis
 # 先打包redisson-common项目到maven仓库
 mkdir gitPillar
 cd gitPillar
-git clone https://github.com/gl0726/bigdata-common.git
+git clone https://github.com/gaolight/bigdata-common.git
 cd bigdata-common
 mvn -U clean install -DskipTests
 # 再打包pillar项目到maven仓库
 cd ../
-git clone https://github.com/gl0726/pillar.git
+git clone https://github.com/gaolight/pillar.git
 cd pillar
 mvn -U clean install -DskipTests
 ```
@@ -357,9 +357,9 @@ public class Pillar {
 
 **更多关于pillarMaster/pillarSlave的使用可以参考单元测试类:**
 
-master:https://github.com/gl0726/pillar/blob/master/pillar-master/src/test/java/org/pillar/master/context/PillarMasterTest.java
+master:https://github.com/gaolight/pillar/blob/master/pillar-master/src/test/java/org/pillar/master/context/PillarMasterTest.java
 
-slave:https://github.com/gl0726/pillar/blob/master/pillar-slave/src/test/java/org/pillar/slave/context/PillarSlaveTest.java
+slave:https://github.com/gaolight/pillar/blob/master/pillar-slave/src/test/java/org/pillar/slave/context/PillarSlaveTest.java
 
 
 
@@ -477,7 +477,7 @@ mvn versions:set -DnewVersion=2.0
 
 #### 代码鸟瞰图
 
-![image-20220413120226781](https://raw.githubusercontent.com/gl0726/pillar/master/picture/picture4.png)
+![image-20220413120226781](https://raw.githubusercontent.com/gaolight/pillar/master/picture/picture4.png)
 
 
 
